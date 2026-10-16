@@ -2,7 +2,7 @@
 
 # AutoVisco
 
-### A self-driving rheometer: physics-constrained signal interpretation for autonomous high-viscosity characterization
+### Physics-informed autonomous rheometry of liquids, gels, and pastes for self-driving laboratories
 
 **Rotational rheometry, rebuilt as a measurement layer for self-driving laboratories.**
 
@@ -231,8 +231,8 @@ If you use AutoVisco, its data, or its code, please cite:
 
 ```bibtex
 @article{rastegardoost2026autovisco,
-  title   = {A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous
-             High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids},
+  title   = {AutoVisco: Physics-Informed Autonomous Rheometry of Liquids, Gels, and Pastes
+             for Self-Driving Laboratories},
   author  = {Rastegardoost, Mohammad M. and Ngunga, Ian and Gaborekwe, Koketso and Bao, Zeqing and
              Naguib, Hani and Le Devedec, Frantz},
   journal = {Digital Discovery},

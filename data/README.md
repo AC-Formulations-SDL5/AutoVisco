@@ -1,7 +1,6 @@
 # AutoVisco data
 
-All data supporting *A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous
-High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids* are provided here as CSV files and
+All data supporting *AutoVisco: Physics-Informed Autonomous Rheometry of Liquids, Gels, and Pastes for Self-Driving Laboratories* are provided here as CSV files and
 released under [CC BY 4.0](LICENSE.md).
 
 Units unless stated otherwise: heights and Z positions in **mm**, spindle speed in **rpm**, torque in

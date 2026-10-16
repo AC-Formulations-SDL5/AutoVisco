@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use this software or data, please cite the article below."
-title: "AutoVisco: a self-driving rheometer"
+title: "AutoVisco: physics-informed autonomous rheometry"
 type: software
 license: MIT
 repository-code: "https://github.com/AC-Formulations-SDL5/AutoVisco"
@@ -28,7 +28,7 @@ authors:
     email: frantz.ledevedec@utoronto.ca
 preferred-citation:
   type: article
-  title: "A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids"
+  title: "AutoVisco: Physics-Informed Autonomous Rheometry of Liquids, Gels, and Pastes for Self-Driving Laboratories"
   journal: "Digital Discovery"
   year: 2026
   status: submitted
