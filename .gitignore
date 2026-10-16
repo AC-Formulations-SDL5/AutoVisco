@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv32/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+*.log
+
+# Proprietary Brookfield communication library (obtain from your Brookfield installation)
+DVT_COM.dll
+
+# Generated at run time
+results/
+analysis/outputs/*
+!analysis/outputs/.gitkeep
+figures/*.svg

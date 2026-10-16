@@ -1,0 +1,45 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite the article below."
+title: "AutoVisco: a self-driving rheometer"
+type: software
+license: MIT
+repository-code: "https://github.com/AC-Formulations-SDL5/AutoVisco"
+url: "https://ac-formulations-sdl5.github.io/AutoVisco/"
+authors:
+  - family-names: Rastegardoost
+    given-names: Mohammad M.
+    affiliation: "Acceleration Consortium, University of Toronto"
+  - family-names: Ngunga
+    given-names: Ian
+    affiliation: "University of Toronto Scarborough"
+  - family-names: Gaborekwe
+    given-names: Koketso
+    affiliation: "University of Waterloo"
+  - family-names: Bao
+    given-names: Zeqing
+    affiliation: "Acceleration Consortium, University of Toronto"
+  - family-names: Naguib
+    given-names: Hani
+    affiliation: "University of Toronto"
+  - family-names: Le Devedec
+    given-names: Frantz
+    affiliation: "Acceleration Consortium, University of Toronto"
+preferred-citation:
+  type: article
+  title: "A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids"
+  journal: "Digital Discovery"
+  year: 2026
+  status: submitted
+  authors:
+    - family-names: Rastegardoost
+      given-names: Mohammad M.
+    - family-names: Ngunga
+      given-names: Ian
+    - family-names: Gaborekwe
+      given-names: Koketso
+    - family-names: Bao
+      given-names: Zeqing
+    - family-names: Naguib
+      given-names: Hani
+    - family-names: Le Devedec
+      given-names: Frantz

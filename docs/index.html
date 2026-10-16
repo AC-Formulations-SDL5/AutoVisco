@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AutoVisco · Self-Driving Rheometer</title>
+<meta name="description" content="AutoVisco: a self-driving rheometer that decodes torque–displacement signals with physics-constrained inference. Data, code and figures.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231a73e8'/%3E%3Cpath d='M10 46 C22 46 26 18 54 16' stroke='white' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<style>
+:root{
+  --blue:#1a73e8;--red:#ea4335;--yellow:#fbbc04;--green:#34a853;--purple:#9334e6;--teal:#12b5cb;
+  --bg:#ffffff;--surface:#f8fafd;--surface2:#eef3fc;--card:#ffffff;--line:#dadce0;
+  --text:#1f1f1f;--muted:#5f6368;--chip:#e8f0fe;--chip-text:#174ea6;--shadow:0 1px 2px rgba(60,64,67,.15),0 2px 6px rgba(60,64,67,.10);
+  --code:#f1f3f4;--hero-a:#e8f0fe;--hero-b:#fef7e0;
+  --font:'Google Sans','Roboto',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1115;--surface:#151820;--surface2:#1b2130;--card:#1a1d24;--line:#2f343e;
+    --text:#e8eaed;--muted:#9aa0a6;--chip:#1e2a44;--chip-text:#a8c7fa;--shadow:0 1px 2px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.35);
+    --code:#20242c;--hero-a:#14213d;--hero-b:#2a2414;--blue:#8ab4f8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1115;--surface:#151820;--surface2:#1b2130;--card:#1a1d24;--line:#2f343e;
+  --text:#e8eaed;--muted:#9aa0a6;--chip:#1e2a44;--chip-text:#a8c7fa;--shadow:0 1px 2px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.35);
+  --code:#20242c;--hero-a:#14213d;--hero-b:#2a2414;--blue:#8ab4f8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%;display:block}
+.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-size:22px;line-height:1;display:inline-block;vertical-align:middle;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+/* app bar */
+header.bar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:20px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:500;font-size:20px;color:var(--text)}
+.brand:hover{text-decoration:none}
+.logo{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 200deg,var(--blue),var(--teal),var(--green),var(--yellow),var(--red),var(--blue));display:grid;place-items:center}
+.logo svg{width:22px;height:22px}
+nav.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+nav.tabs a{color:var(--muted);padding:8px 14px;border-radius:20px;font-size:14px;font-weight:500;white-space:nowrap}
+nav.tabs a:hover,nav.tabs a.on{background:var(--chip);color:var(--chip-text);text-decoration:none}
+.iconbtn{border:0;background:transparent;color:var(--muted);width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center}
+.iconbtn:hover{background:var(--surface2)}
+/* hero */
+.hero{position:relative;overflow:hidden;background:radial-gradient(1200px 500px at 15% -10%,var(--hero-a),transparent 60%),radial-gradient(900px 500px at 100% 20%,var(--hero-b),transparent 60%),var(--bg)}
+#flow{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
+.hero .wrap{position:relative;padding:88px 24px 72px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 8px;font-size:13px;color:var(--muted);box-shadow:var(--shadow)}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 25%,transparent)}
+h1{font-size:clamp(40px,6.4vw,72px);line-height:1.04;letter-spacing:-.02em;margin:22px 0 18px;font-weight:500;max-width:15ch}
+.grad{background:linear-gradient(90deg,var(--blue),var(--purple) 40%,var(--red) 70%,var(--yellow));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,2vw,20px);color:var(--muted);max-width:62ch;margin:0 0 30px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:12px 22px;font-weight:500;font-size:15px;border:1px solid var(--line);color:var(--text);background:var(--card);cursor:pointer}
+.btn:hover{text-decoration:none;box-shadow:var(--shadow)}
+.btn.primary{background:var(--blue);color:#fff;border-color:transparent}
+:root[data-theme="dark"] .btn.primary{color:#0b1a33}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0b1a33}}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:54px}
+.stat{background:color-mix(in srgb,var(--card) 88%,transparent);border:1px solid var(--line);border-radius:20px;padding:18px;backdrop-filter:blur(6px)}
+.stat b{display:block;font-size:30px;font-weight:500;letter-spacing:-.01em}
+.stat span{font-size:13px;color:var(--muted)}
+.stat:nth-child(1) b{color:var(--blue)}.stat:nth-child(2) b{color:var(--green)}.stat:nth-child(3) b{color:var(--purple)}.stat:nth-child(4) b{color:var(--red)}.stat:nth-child(5) b{color:#e37400}
+/* sections */
+section{padding:84px 0;border-top:1px solid var(--line)}
+section.alt{background:var(--surface)}
+.kicker{color:var(--blue);font-weight:500;font-size:14px;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+h2{font-size:clamp(28px,3.6vw,40px);line-height:1.15;font-weight:500;letter-spacing:-.01em;margin:10px 0 14px}
+.sub{color:var(--muted);max-width:70ch;margin:0 0 36px;font-size:17px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+.card h3{margin:12px 0 6px;font-size:19px;font-weight:500}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.badge{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff}
+.b1{background:var(--blue)}.b2{background:var(--red)}.b3{background:var(--green)}.b4{background:#e37400}.b5{background:var(--purple)}.b6{background:var(--teal)}
+.figure{background:#fff;border:1px solid var(--line);border-radius:24px;padding:14px;box-shadow:var(--shadow);cursor:zoom-in}
+.figure img{border-radius:14px}
+.cap{font-size:14px;color:var(--muted);margin-top:10px}
+.eq{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px;margin:12px 0;overflow-x:auto}
+.eq .katex-display{margin:.2em 0}
+.eqlabel{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+/* playground */
+.play{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.panel h3{margin:0 0 4px;font-size:18px;font-weight:500;display:flex;align-items:center;gap:8px}
+.panel .hint{font-size:13px;color:var(--muted);margin:0 0 12px}
+canvas.plot{width:100%;height:260px;display:block;background:var(--surface);border-radius:16px}
+.ctrl{display:grid;grid-template-columns:96px 1fr 64px;align-items:center;gap:10px;margin-top:10px;font-size:14px}
+.ctrl label{color:var(--muted);font-family:'Roboto Mono',monospace}
+.ctrl output{font-family:'Roboto Mono',monospace;text-align:right}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.regime{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13px;font-weight:500;background:var(--chip);color:var(--chip-text)}
+/* segmented */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-bottom:22px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--text);font:500 14px var(--font);padding:10px 18px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--chip);color:var(--chip-text)}
+.seg .ms{font-size:18px}
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(6,1fr);gap:18px}
+.gallery .figure:nth-child(1){grid-column:span 3}.gallery .figure:nth-child(2){grid-column:span 3}
+.gallery .figure:nth-child(3){grid-column:span 6}.gallery .figure:nth-child(4){grid-column:span 3}.gallery .figure:nth-child(5){grid-column:span 3}
+/* data */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:22px}
+.search{flex:1 1 100%;min-width:240px;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:10px 18px;box-shadow:var(--shadow)}
+.search input{border:0;outline:0;background:transparent;color:var(--text);font:16px var(--font);width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipf{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:7px 14px;font:500 14px var(--font);cursor:pointer}
+.chipf.on{background:var(--chip);color:var(--chip-text);border-color:transparent}
+.datasets{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
+.ds{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.ds header{display:flex;align-items:center;gap:12px}
+.ds h3{margin:0;font-size:17px;font-weight:500}
+.ds .path{font:13px 'Roboto Mono',monospace;color:var(--muted)}
+.ds p{margin:0;color:var(--muted);font-size:14px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;border-radius:8px;padding:2px 8px;background:var(--surface2);color:var(--muted)}
+.files{list-style:none;margin:0;padding:0;border-top:1px solid var(--line);max-height:188px;overflow:auto}
+.files li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--line);font-size:13px}
+.files li .fn{font-family:'Roboto Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.files li .meta{color:var(--muted);white-space:nowrap}
+.files li a{display:grid;place-items:center;width:30px;height:30px;border-radius:50%}
+.files li a:hover{background:var(--surface2);text-decoration:none}
+.ds .actions{display:flex;gap:8px;margin-top:auto}
+.ds .actions a{font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.note{display:flex;gap:12px;align-items:flex-start;background:var(--surface2);border-radius:18px;padding:14px 18px;color:var(--muted);font-size:14px;margin-top:22px}
+/* code */
+pre{background:var(--code);border-radius:18px;padding:18px 20px;overflow:auto;font:14px/1.6 'Roboto Mono',monospace;margin:0;position:relative}
+.codecard{position:relative}
+.copy{position:absolute;z-index:2;top:10px;right:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:4px 12px;font:500 13px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px}
+.copy .ms{font-size:16px}
+.tree{font:13.5px/1.75 'Roboto Mono',monospace}
+.tree span{color:var(--muted)}
+/* footer */
+footer{border-top:1px solid var(--line);padding:42px 0;color:var(--muted);font-size:14px;background:var(--surface)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between}
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(10,12,16,.82);display:none;align-items:center;justify-content:center;z-index:60;padding:24px;cursor:zoom-out}
+#lb img{max-height:92vh;max-width:96vw;border-radius:16px;background:#fff}
+#lb.on{display:flex}
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+@media (max-width:900px){
+  .stats{grid-template-columns:repeat(2,1fr)}.grid3{grid-template-columns:1fr}.grid2,.play{grid-template-columns:1fr}
+  .gallery{grid-template-columns:1fr}.gallery .figure{grid-column:auto!important}
+  nav.tabs{display:none}.hero .wrap{padding:56px 16px 48px}.wrap{padding:0 16px}section{padding:60px 0}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="AutoVisco home">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M3 19C9 19 10 7 21 5"/></svg></span>
+      AutoVisco
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#gap">Motivation</a><a href="#physics">Physics</a><a href="#playground">Playground</a>
+      <a href="#pipeline">Pipeline</a><a href="#results">Results</a><a href="#data">Data</a><a href="#code">Code</a><a href="#cite">Cite</a>
+    </nav>
+    <button class="iconbtn" id="theme" aria-label="Toggle dark mode"><span class="ms">dark_mode</span></button>
+    <a class="iconbtn" id="gh" aria-label="GitHub repository" title="GitHub"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg></a>
+  </div>
+</header>
+
+<div class="hero" id="top">
+  <canvas id="flow" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Acceleration Consortium · Self-Driving Lab for Formulations</span>
+    <h1>Rheology, <span class="grad">decoded by physics</span>.</h1>
+    <p class="lead">AutoVisco is a self-driving rheometer. It reads the torque signal of a descending cone, constrains it with lubrication theory, and returns a full flow curve, τ = Kγ̇<sup>n</sup>, with no operator setting the gap.</p>
+    <div class="ctas">
+      <a class="btn primary" href="#data"><span class="ms">dataset</span>Explore the data</a>
+      <a class="btn" id="gh2"><span class="ms">code</span>Get the code</a>
+      <a class="btn" href="#playground"><span class="ms">science</span>Try the physics</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>3.4%</b><span>mean absolute error on Newtonian standards</span></div>
+      <div class="stat"><b>95.7%</b><span>of calibration samples within ±10%</span></div>
+      <div class="stat"><b>1.00→0.39</b><span>flow index, Newtonian to strongly shear-thinning</span></div>
+      <div class="stat"><b>4.7×</b><span>faster than manual characterization and washing</span></div>
+      <div class="stat"><b>&lt;20 min</b><span>hands-on time for an 18-sample run</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="gap">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">lightbulb</span>Motivation</div>
+    <h2 class="reveal">Self-driving labs can decide. They still cannot feel how a formulation flows.</h2>
+    <p class="sub reveal">Planners propose candidates in seconds, but rheology is still measured by hand. Existing automated viscometers act as proxies and return one Newtonian number, which hides exactly the shear-thinning and structure-forming behaviour that formulators care about.</p>
+    <div class="grid3">
+      <div class="card reveal"><div class="badge b1"><span class="ms">psychology</span></div><h3>The planner is ready</h3><p>Bayesian optimization and active learning already outperform grid and random search. Decision-making is rarely the bottleneck.</p></div>
+      <div class="card reveal"><div class="badge b2"><span class="ms">water_drop</span></div><h3>Characterization lags</h3><p>Pipetting and camera proxies report a single viscosity per fluid. None recover a non-Newtonian constitutive curve autonomously.</p></div>
+      <div class="card reveal"><div class="badge b3"><span class="ms">cyclone</span></div><h3>AutoVisco fills the gap</h3><p>Automated rotational rheometry over 1–125,000 cP that returns a calibrated flow curve and rheological class from one universal calibration.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="physics" class="alt">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">functions</span>Physics-informed</div>
+    <h2 class="reveal">Treat the descent as the signal.</h2>
+    <p class="sub reveal">Instead of engineering micrometre-precise gap control, the platform lets lubrication theory explain how torque grows as the cone approaches the plate, and absorbs mechanical uncertainty into fitted parameters.</p>
+    <div class="grid2">
+      <div class="figure reveal" data-full="assets/cone_plate.png"><img src="assets/cone_plate.png" alt="Cone-and-plate geometry used in the lubrication model" loading="lazy"></div>
+      <div>
+        <div class="eqlabel reveal"><span class="ms">straighten</span>Local gap thickness</div>
+        <div class="eq reveal" data-tex="H(r) = h + r\tan\alpha"></div>
+        <div class="eqlabel reveal"><span class="ms">rotate_right</span>Torque across parallel-plate, transition and cone-and-plate regimes</div>
+        <div class="eq reveal" data-tex="T = 2\pi\mu\omega\int_{0}^{R}\frac{r^{3}}{H(r)}\,dr"></div>
+        <div class="eqlabel reveal"><span class="ms">tune</span>Regularized drag model: A carries viscosity, h<sub>c</sub> absorbs backlash and gap-zero error</div>
+        <div class="eq reveal" data-tex="D(h)=\frac{T_{\%}}{\Omega}=\frac{A}{h+h_c}+B"></div>
+        <div class="eqlabel reveal"><span class="ms">show_chart</span>Multi-speed descents give the constitutive law</div>
+        <div class="eq reveal" data-tex="A(\dot\gamma)=A_0\,\dot\gamma^{\,n-1}\quad\Rightarrow\quad \tau = K\dot\gamma^{\,n}"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="playground">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">science</span>Interactive</div>
+    <h2 class="reveal">Physics playground</h2>
+    <p class="sub reveal">Move the sliders to see how the drag model and the power law behave. These are the same functional forms the pipeline fits to every descent.</p>
+    <div class="play">
+      <div class="panel reveal">
+        <h3><span class="ms" style="color:var(--blue)">south</span>Drag during descent</h3>
+        <p class="hint">D(h) = A / (h + h<sub>c</sub>) + B. Viscosity scales A; h<sub>c</sub> regularizes the h → 0 singularity.</p>
+        <canvas class="plot" id="dragPlot"></canvas>
+        <div class="ctrl"><label for="sA">A</label><input id="sA" type="range" min="2" max="60" step="0.5" value="20"><output id="oA"></output></div>
+        <div class="ctrl"><label for="sH">h_c (mm)</label><input id="sH" type="range" min="0.05" max="1.0" step="0.01" value="0.28"><output id="oH"></output></div>
+        <div class="ctrl"><label for="sB">B</label><input id="sB" type="range" min="0" max="40" step="0.5" value="8"><output id="oB"></output></div>
+      </div>
+      <div class="panel reveal">
+        <h3><span class="ms" style="color:var(--purple)">ssid_chart</span>Flow curve and regime</h3>
+        <p class="hint">Apparent viscosity μ<sub>app</sub> = Kγ̇<sup>n−1</sup> on log axes. <span class="regime" id="regime">Newtonian</span></p>
+        <canvas class="plot" id="flowPlot"></canvas>
+        <div class="ctrl"><label for="sK">K (Pa·sⁿ)</label><input id="sK" type="range" min="1" max="100" step="0.5" value="30"><output id="oK"></output></div>
+        <div class="ctrl"><label for="sN">n</label><input id="sN" type="range" min="0.2" max="1.6" step="0.01" value="1"><output id="oN"></output></div>
+        <div class="ctrl"><label>presets</label><div class="chips" id="presets"></div><span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline" class="alt">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">account_tree</span>Autonomy</div>
+    <h2 class="reveal">From a raw descent to a rheological class, with no operator.</h2>
+    <p class="sub reveal">A physics-constrained feedback layer stops each descent at contact, the analysis chain turns drag into a flow curve, and washing runs while the stage travels to the next cell.</p>
+    <div class="seg reveal" role="tablist">
+      <button class="on" data-img="assets/workflow.png" data-cap="Closed-loop workflow: calibration, incremental Z-descent, confidence-weighted hit detection, evaluation, and concurrent washing."><span class="ms">sync</span>Workflow</button>
+      <button data-img="assets/pipeline.png" data-cap="One inference chain for every chemistry. h_c*, k, p and c_τ are calibrated once on silicone oils."><span class="ms">hub</span>Inference</button>
+      <button data-img="assets/descent_signatures.png" data-cap="The observation behind the platform: torque, drag and viscosity signatures separate by viscosity during descent."><span class="ms">insights</span>Descent signal</button>
+      <button data-img="assets/platform.png" data-cap="Hardware: Cartesian motion stage, cone-shaped torquemeter, 18-cell deck, and magnetically driven washing station."><span class="ms">precision_manufacturing</span>Hardware</button>
+    </div>
+    <div class="figure reveal" id="pipeFig" data-full="assets/workflow.png"><img id="pipeImg" src="assets/workflow.png" alt="Pipeline figure"></div>
+    <p class="cap" id="pipeCap">Closed-loop workflow: calibration, incremental Z-descent, confidence-weighted hit detection, evaluation, and concurrent washing.</p>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">monitoring</span>Results</div>
+    <h2 class="reveal">One calibration, every chemistry.</h2>
+    <p class="sub reveal">Calibrated once on silicone oils, the same model stack resolves lubricants, rheology modifiers and thermal interface materials, and places AutoVisco as the constitutive measurement layer for closed-loop discovery.</p>
+    <div class="gallery">
+      <div class="figure reveal" data-full="assets/calibration.png"><img src="assets/calibration.png" alt="Collapse of normalized drag and predicted versus reference viscosity" loading="lazy"><div class="cap">Normalized drag collapses onto one master shape; predictions track the parity line over two decades.</div></div>
+      <div class="figure reveal" data-full="assets/flow_curves.png"><img src="assets/flow_curves.png" alt="Apparent viscosity versus shear rate" loading="lazy"><div class="cap">Silicone stays Newtonian while PEG, Solagum, Sepineo and Carbopol shear-thin progressively.</div></div>
+      <div class="figure reveal" data-full="assets/material_classes.png"><img src="assets/material_classes.png" alt="Material classes" loading="lazy"><div class="cap">Lubricants, rheology modifiers and thermal interface materials through one autonomous workflow.</div></div>
+      <div class="figure reveal" data-full="assets/method_landscape.png"><img src="assets/method_landscape.png" alt="Automated viscometry landscape" loading="lazy"><div class="cap">The only automated method here that returns a flow curve rather than a single value.</div></div>
+      <div class="figure reveal" data-full="assets/closed_loop.png"><img src="assets/closed_loop.png" alt="Closed-loop formulation campaign" loading="lazy"><div class="cap">AutoVisco as the measurement layer of a self-driving formulation loop.</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="data" class="alt">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">dataset</span>Data availability</div>
+    <h2 class="reveal">Every dataset behind the paper, as plain CSV.</h2>
+    <p class="sub reveal">Raw descents, calibration runs, material measurements and analysis outputs, organized by manuscript figure and released under CC BY 4.0.</p>
+    <div class="toolbar reveal">
+      <div class="search"><span class="ms">search</span><input id="q" type="search" placeholder="Search datasets, files or figures (e.g. Sepineo, Fig. 7)" aria-label="Search datasets"></div>
+      <div class="chips" id="cats" style="flex:1"></div>
+      <a class="btn primary" id="zip"><span class="ms">download</span>Download all</a>
+    </div>
+    <div class="datasets" id="ds"></div>
+    <div class="note"><span class="ms">info</span><div>Column definitions, units and naming conventions are documented in <a id="dataReadme">data/README.md</a>. Torque is in percent of full scale (100% = 7,187.0 dyne·cm) and rotational drag is torque divided by spindle speed in rpm.</div></div>
+  </div>
+</section>
+
+<section id="code">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">terminal</span>Code</div>
+    <h2 class="reveal">Run it, test it, reproduce it.</h2>
+    <p class="sub reveal">The control software, live characterization engine and web dashboard ship as one Python package. Analysis and figures run without any hardware.</p>
+    <div class="grid2" style="align-items:start">
+      <div>
+        <div class="codecard reveal"><button class="copy" data-copy="c1"><span class="ms">content_copy</span>Copy</button>
+<pre id="c1">git clone https://github.com/AC-Formulations-SDL5/AutoVisco.git
+cd AutoVisco
+pip install -e ".[analysis,dev]"
+pytest</pre></div>
+        <p class="cap">Install the package and run the test suite (hardware tests are skipped automatically).</p>
+        <div class="codecard reveal" style="margin-top:18px"><button class="copy" data-copy="c2"><span class="ms">content_copy</span>Copy</button>
+<pre id="c2"># Reproduce the material rheology (Fig. 8)
+jupyter lab analysis/figure8_material_rheology.ipynb
+
+# Live characterization engine on a dataset
+python examples/live_pipeline_demo.py data/06_materials/sepineo.csv
+
+# Hardware + web dashboard
+python run_viscometry.py</pre></div>
+      </div>
+      <div class="card reveal tree">
+AutoVisco/<br>
+├─ src/viscometry/ <span>package</span><br>
+│&nbsp; ├─ hardware/ <span>CNC · ESP32 pumps · torquemeter</span><br>
+│&nbsp; ├─ measurement/ <span>drag feedback · hit-point detection</span><br>
+│&nbsp; ├─ analysis/ <span>regularized-hyperbola fits</span><br>
+│&nbsp; ├─ rheology/ <span>calibration · flow curves · live engine</span><br>
+│&nbsp; ├─ discovery/ <span>RPM torque ladder</span><br>
+│&nbsp; ├─ run/ <span>controller · settings · export</span><br>
+│&nbsp; └─ web/ <span>Flask + Socket.IO dashboard</span><br>
+├─ web/ <span>dashboard templates and assets</span><br>
+├─ config/ · firmware/esp32/<br>
+├─ data/ <span>all CSV datasets</span><br>
+├─ analysis/ <span>reproduction notebook</span><br>
+├─ figures/ <span>vector figure scripts</span><br>
+├─ examples/ · scripts/ · tests/<br>
+└─ docs/ <span>this website</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cite" class="alt">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="ms">format_quote</span>Cite</div>
+    <h2 class="reveal">Citation</h2>
+    <p class="sub reveal">If AutoVisco, its data or its code help your work, please cite the article.</p>
+    <div class="codecard reveal"><button class="copy" data-copy="bib"><span class="ms">content_copy</span>Copy BibTeX</button>
+<pre id="bib">@article{rastegardoost2026autovisco,
+  title   = {A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous
+             High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids},
+  author  = {Rastegardoost, Mohammad M. and Ngunga, Ian and Gaborekwe, Koketso and Bao, Zeqing and
+             Naguib, Hani and Le Devedec, Frantz},
+  journal = {Digital Discovery},
+  year    = {2026},
+  note    = {Submitted}
+}</pre></div>
+    <div class="grid3" style="margin-top:28px">
+      <div class="card reveal"><div class="badge b5"><span class="ms">groups</span></div><h3>Team</h3><p>Mohammad M. Rastegardoost, Ian Ngunga, Koketso Gaborekwe, Zeqing Bao, Hani Naguib, Frantz Le Devedec.</p></div>
+      <div class="card reveal"><div class="badge b6"><span class="ms">apartment</span></div><h3>Affiliations</h3><p>Acceleration Consortium, University of Toronto; University of Toronto Scarborough; University of Waterloo.</p></div>
+      <div class="card reveal"><div class="badge b4"><span class="ms">volunteer_activism</span></div><h3>Funding</h3><p>Canada First Research Excellence Fund (CFREF-2022-00042) and SEKISUI CHEMICAL CO., LTD.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 AutoVisco authors · Code <a id="lic">MIT</a> · Data <a id="dlic">CC BY 4.0</a></div>
+    <div>Acceleration Consortium · University of Toronto</div>
+  </div>
+</footer>
+
+<div id="lb" role="dialog" aria-label="Figure preview"><img alt=""></div>
+
+<script src="datasets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script>
+const OWNER = "AC-Formulations-SDL5", REPO = "AutoVisco", BRANCH = "main";
+const GH = `https://github.com/${OWNER}/${REPO}`;
+const RAW = `https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}`;
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+// links
+$("#gh").href = GH; $("#gh2").href = GH; $("#zip").href = `${GH}/archive/refs/heads/${BRANCH}.zip`;
+$("#dataReadme").href = `${GH}/blob/${BRANCH}/data/README.md`;
+$("#lic").href = `${GH}/blob/${BRANCH}/LICENSE`; $("#dlic").href = `${GH}/blob/${BRANCH}/data/LICENSE.md`;
+
+// theme
+const root = document.documentElement;
+try { const t = localStorage.getItem("av-theme"); if (t) root.dataset.theme = t; } catch (e) {}
+const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+const setIcon = () => $("#theme .ms").textContent = isDark() ? "light_mode" : "dark_mode";
+setIcon();
+$("#theme").onclick = () => { root.dataset.theme = isDark() ? "light" : "dark"; try { localStorage.setItem("av-theme", root.dataset.theme); } catch (e) {} setIcon(); drawAll(); };
+const css = v => getComputedStyle(root).getPropertyValue(v).trim();
+
+// equations
+$$(".eq").forEach(el => { try { katex.render(el.dataset.tex, el, { displayMode: true, throwOnError: false }); } catch (e) { el.textContent = el.dataset.tex; } });
+
+// reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 });
+$$(".reveal").forEach(el => io.observe(el));
+
+// active tab
+const tabs = $$("nav.tabs a");
+const so = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) tabs.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-45% 0px -50% 0px" });
+$$("section[id]").forEach(s => so.observe(s));
+
+// lightbox
+const lb = $("#lb");
+document.addEventListener("click", e => { const f = e.target.closest(".figure"); if (f) { $("img", lb).src = f.dataset.full || $("img", f).src; lb.classList.add("on"); } });
+lb.onclick = () => lb.classList.remove("on");
+document.addEventListener("keydown", e => { if (e.key === "Escape") lb.classList.remove("on"); });
+
+// pipeline segmented control
+$$(".seg button").forEach(b => b.onclick = () => {
+  $$(".seg button").forEach(x => x.classList.toggle("on", x === b));
+  $("#pipeImg").src = b.dataset.img; $("#pipeFig").dataset.full = b.dataset.img; $("#pipeCap").textContent = b.dataset.cap;
+});
+
+// copy buttons
+$$(".copy").forEach(b => b.onclick = async () => {
+  const txt = $("#" + b.dataset.copy).innerText;
+  try { await navigator.clipboard.writeText(txt); b.lastChild.textContent = "Copied"; setTimeout(() => b.lastChild.textContent = b.dataset.copy === "bib" ? "Copy BibTeX" : "Copy", 1400); } catch (e) {}
+});
+
+// ---------- hero: shear-flow particles over a faint neural lattice ----------
+(() => {
+  const cv = $("#flow"), ctx = cv.getContext("2d"); let W, H, pts = [], nodes = [], t = 0;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const cols = ["#1a73e8", "#34a853", "#fbbc04", "#ea4335", "#9334e6"];
+  function size() {
+    const r = devicePixelRatio || 1; W = cv.clientWidth; H = cv.clientHeight; cv.width = W * r; cv.height = H * r; ctx.setTransform(r, 0, 0, r, 0, 0);
+    pts = Array.from({ length: Math.min(160, Math.floor(W / 7)) }, () => ({ x: Math.random() * W, y: Math.random() * H, c: cols[Math.floor(Math.random() * cols.length)] }));
+    nodes = Array.from({ length: 18 }, () => ({ x: W * (.55 + Math.random() * .45), y: Math.random() * H }));
+  }
+  function frame() {
+    t += 1; ctx.clearRect(0, 0, W, H);
+    const dark = isDark();
+    ctx.lineWidth = 1; ctx.strokeStyle = dark ? "rgba(138,180,248,.10)" : "rgba(26,115,232,.08)";
+    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+      const a = nodes[i], b = nodes[j]; if (Math.hypot(a.x - b.x, a.y - b.y) < 190) { ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+    }
+    nodes.forEach(n => { ctx.fillStyle = dark ? "rgba(138,180,248,.22)" : "rgba(26,115,232,.16)"; ctx.beginPath(); ctx.arc(n.x, n.y, 2.6, 0, 7); ctx.fill(); });
+    pts.forEach(p => {
+      const v = .25 + 2.2 * (1 - p.y / H);                // Couette flow: velocity grows linearly away from the plate
+      const x0 = p.x; p.x += reduce ? 0 : v; if (p.x > W + 20) { p.x = -20; }
+      ctx.strokeStyle = p.c; ctx.globalAlpha = dark ? .55 : .35; ctx.lineWidth = 1.6;
+      ctx.beginPath(); ctx.moveTo(p.x - v * 9, p.y); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.globalAlpha = 1;
+    });
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  addEventListener("resize", size); size(); frame();
+})();
+
+// ---------- playground ----------
+function setupCanvas(c) { const r = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight; c.width = w * r; c.height = h * r; const x = c.getContext("2d"); x.setTransform(r, 0, 0, r, 0, 0); return [x, w, h]; }
+function axes(x, w, h, pad, xl, yl) {
+  x.strokeStyle = css("--line"); x.lineWidth = 1; x.beginPath(); x.moveTo(pad.l, pad.t); x.lineTo(pad.l, h - pad.b); x.lineTo(w - pad.r, h - pad.b); x.stroke();
+  x.fillStyle = css("--muted"); x.font = "12px Roboto, sans-serif"; x.textAlign = "center"; x.fillText(xl, (pad.l + w - pad.r) / 2, h - 8);
+  x.save(); x.translate(14, (pad.t + h - pad.b) / 2); x.rotate(-Math.PI / 2); x.fillText(yl, 0, 0); x.restore();
+}
+function drawDrag() {
+  const A = +$("#sA").value, hc = +$("#sH").value, B = +$("#sB").value;
+  $("#oA").textContent = A.toFixed(1); $("#oH").textContent = hc.toFixed(2); $("#oB").textContent = B.toFixed(1);
+  const [x, w, h] = setupCanvas($("#dragPlot")), pad = { l: 46, r: 14, t: 14, b: 34 }, hmax = 0.6;
+  const f = z => A / (z + hc) + B, ymax = Math.max(f(0) * 1.1, 10);
+  axes(x, w, h, pad, "height h (mm)", "drag D");
+  const X = z => pad.l + (z / hmax) * (w - pad.l - pad.r), Y = d => h - pad.b - (d / ymax) * (h - pad.t - pad.b);
+  x.fillStyle = css("--muted"); x.font = "11px Roboto Mono, monospace"; x.textAlign = "center";
+  [0, .2, .4, .6].forEach(v => x.fillText(v.toFixed(1), X(v), h - pad.b + 14));
+  x.textAlign = "right"; [0, ymax / 2, ymax].forEach(v => x.fillText(v.toFixed(0), pad.l - 6, Y(v) + 4));
+  // pure 1/h reference
+  x.setLineDash([5, 5]); x.strokeStyle = css("--muted"); x.beginPath();
+  for (let z = 0.02; z <= hmax; z += .005) { const d = A / z + B; if (d > ymax) continue; x.lineTo(X(z), Y(d)); } x.stroke(); x.setLineDash([]);
+  // regularized model
+  const g = x.createLinearGradient(pad.l, 0, w, 0); g.addColorStop(0, "#1a73e8"); g.addColorStop(1, "#9334e6");
+  x.strokeStyle = g; x.lineWidth = 3; x.beginPath(); for (let z = 0; z <= hmax; z += .004) x.lineTo(X(z), Y(f(z))); x.stroke();
+  // synthetic measurements
+  x.fillStyle = "#ea4335"; for (let z = 0.02; z <= hmax; z += 0.04) { const n = Math.sin(z * 91) * 0.03 * f(z); x.beginPath(); x.arc(X(z), Y(f(z) + n), 3.2, 0, 7); x.fill(); }
+  x.fillStyle = css("--muted"); x.textAlign = "left"; x.font = "12px Roboto, sans-serif"; x.fillText("— — pure 1/h model", w - 150, pad.t + 12);
+}
+function drawFlow() {
+  const K = +$("#sK").value, n = +$("#sN").value; $("#oK").textContent = K.toFixed(1); $("#oN").textContent = n.toFixed(2);
+  const reg = n > 1.05 ? ["Shear-thickening", "#ea4335"] : n < 0.95 ? ["Shear-thinning", "#9334e6"] : ["Newtonian", "#1a73e8"];
+  const rb = $("#regime"); rb.textContent = reg[0]; rb.style.background = reg[1] + "22"; rb.style.color = reg[1];
+  const [x, w, h] = setupCanvas($("#flowPlot")), pad = { l: 52, r: 14, t: 14, b: 34 };
+  const gx = [-1, 3], gy = [-1, 3];  // log10 ranges: shear rate 0.1-1000 1/s, viscosity 0.1-1000 Pa·s
+  axes(x, w, h, pad, "shear rate γ̇ (1/s)", "μ_app (Pa·s)");
+  const X = l => pad.l + (l - gx[0]) / (gx[1] - gx[0]) * (w - pad.l - pad.r), Y = l => h - pad.b - (l - gy[0]) / (gy[1] - gy[0]) * (h - pad.t - pad.b);
+  x.strokeStyle = css("--line"); x.fillStyle = css("--muted"); x.font = "11px Roboto Mono, monospace";
+  for (let d = gx[0]; d <= gx[1]; d++) { x.textAlign = "center"; x.fillText("10" + sup(d), X(d), h - pad.b + 14); }
+  for (let d = gy[0]; d <= gy[1]; d++) { x.textAlign = "right"; x.fillText("10" + sup(d), pad.l - 6, Y(d) + 4); x.beginPath(); x.moveTo(pad.l, Y(d)); x.lineTo(w - pad.r, Y(d)); x.stroke(); }
+  x.save(); x.beginPath(); x.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b); x.clip();
+  x.strokeStyle = reg[1]; x.lineWidth = 3; x.beginPath();
+  for (let l = gx[0]; l <= gx[1]; l += .02) { const g = 10 ** l, mu = K * g ** (n - 1); x.lineTo(X(l), Y(Math.log10(mu))); } x.stroke();
+  x.fillStyle = reg[1]; for (let l = -0.6; l <= 2.6; l += .4) { const mu = K * (10 ** l) ** (n - 1); x.beginPath(); x.arc(X(l), Y(Math.log10(mu)), 3.4, 0, 7); x.fill(); }
+  x.restore();
+}
+const sup = d => String(d).replace("-", "⁻").replace(/\d/g, c => "⁰¹²³⁴⁵⁶⁷⁸⁹"[c]);
+const presets = [["Silicone", 30, 1.0], ["PEG", 13.9, 0.82], ["Sepineo", 18.8, 0.69], ["Carbopol", 13.8, 0.39], ["HY-500", 45, 1.4]];
+presets.forEach(([nm, K, n]) => { const b = document.createElement("button"); b.className = "chipf"; b.textContent = nm; b.onclick = () => { $("#sK").value = K; $("#sN").value = n; drawFlow(); $$("#presets .chipf").forEach(c => c.classList.toggle("on", c === b)); }; $("#presets").append(b); });
+["sA", "sH", "sB"].forEach(id => $("#" + id).addEventListener("input", drawDrag));
+["sK", "sN"].forEach(id => $("#" + id).addEventListener("input", () => { $$("#presets .chipf").forEach(c => c.classList.remove("on")); drawFlow(); }));
+function drawAll() { drawDrag(); drawFlow(); }
+addEventListener("resize", drawAll); drawAll();
+
+// ---------- data catalogue ----------
+const DS = window.AUTOVISCO_DATASETS || [];
+const CATS = { all: ["All", "apps"], manual: ["Manual", "front_hand"], calibration: ["Calibration", "tune"], materials: ["Materials", "science"], physics: ["Physics & analysis", "functions"] };
+const ICON = { manual: ["front_hand", "b4"], calibration: ["tune", "b1"], materials: ["science", "b3"], physics: ["functions", "b5"] };
+let cat = "all";
+Object.entries(CATS).forEach(([k, [label, ic]]) => { const b = document.createElement("button"); b.className = "chipf" + (k === "all" ? " on" : ""); b.innerHTML = `<span class="ms" style="font-size:18px">${ic}</span> ${label}`; b.onclick = () => { cat = k; $$("#cats .chipf").forEach(c => c.classList.toggle("on", c === b)); render(); }; $("#cats").append(b); });
+const kb = n => n > 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1024)) + " KB";
+function render() {
+  const q = $("#q").value.trim().toLowerCase(); const box = $("#ds"); box.innerHTML = "";
+  DS.filter(d => cat === "all" || d.cat === cat).forEach(d => {
+    const hay = (d.title + " " + d.desc + " " + d.folder + " " + d.figs.join(" ")).toLowerCase();
+    const files = d.files.filter(f => !q || hay.includes(q) || f.name.toLowerCase().includes(q));
+    if (q && !files.length) return;
+    const [ic, cl] = ICON[d.cat]; const el = document.createElement("article"); el.className = "ds";
+    el.innerHTML = `<header><div class="badge ${cl}"><span class="ms">${ic}</span></div><div><h3>${d.title}</h3><div class="path">data/${d.folder}/</div></div></header>
+      <p>${d.desc}</p><div class="tags">${d.figs.map(f => `<span class="tag">${f}</span>`).join("")}<span class="tag">${d.files.length} file${d.files.length > 1 ? "s" : ""}</span></div>
+      <ul class="files">${files.map(f => `<li><span class="ms" style="font-size:18px;color:var(--muted)">table</span><span class="fn" title="${f.name}">${f.name}</span><span class="meta">${f.rows.toLocaleString()} rows · ${kb(f.size)}</span><a href="${RAW}/data/${d.folder}/${encodeURIComponent(f.name)}" download title="Download ${f.name}" aria-label="Download ${f.name}"><span class="ms" style="font-size:18px">download</span></a></li>`).join("")}</ul>
+      <div class="actions"><a href="${GH}/tree/${BRANCH}/data/${d.folder}"><span class="ms" style="font-size:18px">folder_open</span>Browse on GitHub</a></div>`;
+    box.append(el);
+  });
+  if (!box.children.length) box.innerHTML = `<p class="sub">No datasets match “${q}”.</p>`;
+}
+$("#q").addEventListener("input", render); render();
+</script>
+</body>
+</html>
