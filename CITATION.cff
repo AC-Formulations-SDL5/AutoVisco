@@ -9,6 +9,7 @@ authors:
   - family-names: Rastegardoost
     given-names: Mohammad M.
     affiliation: "Acceleration Consortium, University of Toronto"
+    email: m.rastegardoost@utoronto.ca
   - family-names: Ngunga
     given-names: Ian
     affiliation: "University of Toronto Scarborough"
@@ -24,6 +25,7 @@ authors:
   - family-names: Le Devedec
     given-names: Frantz
     affiliation: "Acceleration Consortium, University of Toronto"
+    email: frantz.ledevedec@utoronto.ca
 preferred-citation:
   type: article
   title: "A Self-Driving Rheometer: Physics-Constrained Signal Interpretation for Autonomous High-Viscosity Characterization of Newtonian and Non-Newtonian Fluids"

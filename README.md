@@ -250,6 +250,16 @@ University of Waterloo.
 This research was funded in part by the Canada First Research Excellence Fund (CFREF-2022-00042) through the
 Acceleration Consortium and by SEKISUI CHEMICAL CO., LTD.
 
+## Contact
+
+| | Email | LinkedIn |
+| --- | --- | --- |
+| **Mohammad (Mahdi) Rastegardoost** | [m.rastegardoost@utoronto.ca](mailto:m.rastegardoost@utoronto.ca) · [m.rastegardoost@gmail.com](mailto:m.rastegardoost@gmail.com) | [linkedin.com/in/mahdirstgr](https://www.linkedin.com/in/mahdirstgr/) |
+| **Frantz Le Devedec** | [frantz.ledevedec@utoronto.ca](mailto:frantz.ledevedec@utoronto.ca) | [linkedin.com/in/frantzld56](https://www.linkedin.com/in/frantzld56/) |
+
+Questions, collaborations, and bug reports are welcome by email or through
+[GitHub issues](https://github.com/AC-Formulations-SDL5/AutoVisco/issues).
+
 ## License
 
 Code is released under the [MIT License](LICENSE). Data in [`data/`](data) are released under
